@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CricSmart Logo</title>
+    <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%2301147C'/><path d='M30 30 Q50 20 70 30 Q80 50 70 70 Q50 80 30 70 Q20 50 30 30' fill='%23ff6b6b' stroke='%23fff' stroke-width='2'/><circle cx='50' cy='50' r='8' fill='%23fff'/><path d='M35 35 L65 65 M65 35 L35 65' stroke='%23fff' stroke-width='2'/></svg>" type="image/svg+xml">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .logo-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: #01147C;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(1, 20, 124, 0.3);
+            flex-shrink: 0;
+        }
+        
+        .cricket-icon {
+            width: 30px;
+            height: 30px;
+            position: relative;
+        }
+        
+        .cricket-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M30 30 Q50 20 70 30 Q80 50 70 70 Q50 80 30 70 Q20 50 30 30" fill="%23ff6b6b" stroke="%23fff" stroke-width="2"/><circle cx="50" cy="50" r="8" fill="%23fff"/><path d="M35 35 L65 65 M65 35 L35 65" stroke="%23fff" stroke-width="2"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: #01147C;
+            letter-spacing: -0.5px;
+        }
+        
+        .tagline {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+        
+        .description {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            border-left: 4px solid #01147C;
+        }
+        
+        .description h3 {
+            color: #01147C;
+            margin-top: 0;
+        }
+        
+        .copy-btn {
+            background: #01147C;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            background: #0152cc;
+            transform: translateY(-1px);
+        }
+        
+        .browser-demo {
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+        }
+        
+        .browser-tab {
+            background: white;
+            border-radius: 8px 8px 0 0;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .favicon {
+            width: 16px;
+            height: 16px;
+            background: #01147C;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .favicon-cricket {
+            width: 10px;
+            height: 10px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M30 30 Q50 20 70 30 Q80 50 70 70 Q50 80 30 70 Q20 50 30 30" fill="%23ff6b6b"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .url-bar {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 0 0 8px 8px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .logo-variations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .logo-variation {
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-variation:hover {
+            border-color: #01147C;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(1, 20, 124, 0.1);
+        }
+        
+        .small-logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #01147C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .small-icon {
+            width: 24px;
+            height: 24px;
+            background: #01147C;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .small-cricket {
+            width: 14px;
+            height: 14px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M30 30 Q50 20 70 30 Q80 50 70 70 Q50 80 30 70 Q20 50 30 30" fill="%23ff6b6b" stroke="%23fff" stroke-width="2"/><circle cx="50" cy="50" r="8" fill="%23fff"/><path d="M35 35 L65 65 M65 35 L35 65" stroke="%23fff" stroke-width="2"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .icon-only {
+            width: 40px;
+            height: 40px;
+            background: #01147C;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 4px 12px rgba(1, 20, 124, 0.3);
+        }
+        
+        .icon-cricket {
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M30 30 Q50 20 70 30 Q80 50 70 70 Q50 80 30 70 Q20 50 30 30" fill="%23ff6b6b" stroke="%23fff" stroke-width="2"/><circle cx="50" cy="50" r="8" fill="%23fff"/><path d="M35 35 L65 65 M65 35 L35 65" stroke="%23fff" stroke-width="2"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <div class="logo">
+            <div class="logo-icon">
+                <div class="cricket-icon"></div>
+            </div>
+            <div class="logo-text">CricSmart</div>
+        </div>
+        
+        <div class="tagline">Intelligent Cricket Scoring Platform</div>
+        
+        <div class="description">
+            <h3>🏏 About CricSmart</h3>
+            <p><strong>CricSmart</strong> is a modern, intelligent cricket scoring platform designed for the digital age. Combining the traditional spirit of cricket with smart technology, CricSmart offers:</p>
+            <ul>
+                <li>📱 <strong>Mobile-First Design</strong> - Perfect for scoring on any device</li>
+                <li>🏏 <strong>Live Match Scoring</strong> - Real-time ball-by-ball updates</li>
+                <li>📊 <strong>Advanced Analytics</strong> - Comprehensive match statistics</li>
+                <li>🔗 <strong>Shareable Matches</strong> - Share live matches with anyone</li>
+                <li>📄 <strong>Professional Reports</strong> - Download detailed PDF scorecards</li>
+                <li>🎯 <strong>Multi-Match Support</strong> - Manage multiple tournaments</li>
+            </ul>
+        </div>
+        
+        <div class="browser-demo">
+            <h4 style="margin-top: 0; color: #01147C;">🌐 Browser Integration Preview</h4>
+            <div class="browser-tab">
+                <div class="favicon">
+                    <div class="favicon-cricket"></div>
+                </div>
+                <span>CricSmart - Live Cricket Scoring</span>
+            </div>
+            <div class="url-bar">
+                🔒 cricsmart.app/match/live?match_id=abc123
+            </div>
+        </div>
+        
+        <div class="logo-variations">
+            <div class="logo-variation">
+                <div class="small-logo">
+                    <div class="small-icon">
+                        <div class="small-cricket"></div>
+                    </div>
+                    CricSmart
+                </div>
+                <p style="font-size: 12px; color: #666; margin-top: 10px;">App Header</p>
+            </div>
+            
+            <div class="logo-variation">
+                <div class="icon-only">
+                    <div class="icon-cricket"></div>
+                </div>
+                <p style="font-size: 12px; color: #666; margin-top: 10px;">Favicon</p>
+            </div>
+            
+            <div class="logo-variation">
+                <div style="font-size: 18px; font-weight: 700; color: #01147C;">
+                    🏏 CricSmart
+                </div>
+                <p style="font-size: 12px; color: #666; margin-top: 10px;">Emoji Version</p>
+            </div>
+        </div>
+        
+        <button class="copy-btn" onclick="copyDescription()">📋 Copy App Description</button>
+    </div>
+    
+    <script>
+        function copyDescription() {
+            const description = `CricSmart - Intelligent Cricket Scoring Platform
+
+CricSmart is a modern, intelligent cricket scoring platform designed for the digital age. Combining the traditional spirit of cricket with smart technology, CricSmart offers:
+
+📱 Mobile-First Design - Perfect for scoring on any device
+🏏 Live Match Scoring - Real-time ball-by-ball updates  
+📊 Advanced Analytics - Comprehensive match statistics
+🔗 Shareable Matches - Share live matches with anyone
+📄 Professional Reports - Download detailed PDF scorecards
+🎯 Multi-Match Support - Manage multiple tournaments
+
+Perfect for clubs, schools, tournaments, and cricket enthusiasts who want professional-grade scoring with modern convenience.`;
+            
+            navigator.clipboard.writeText(description).then(() => {
+                alert('✅ Description copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>

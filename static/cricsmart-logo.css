@@ -1,0 +1,49 @@
+/* CricSmart Logo Styling */
+.logo-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-circle {
+    width: 60px;
+    height: 60px;
+    background: #01147C;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(1, 20, 124, 0.3);
+    overflow: hidden;
+    position: relative;
+}
+
+.logo-circle img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.logo-circle.small {
+    width: 40px;
+    height: 40px;
+    box-shadow: 0 2px 8px rgba(1, 20, 124, 0.3);
+}
+
+.logo-circle.small img {
+    width: 40px;
+    height: 40px;
+}
+
+.logo-text {
+    font-size: 28px;
+    font-weight: 700;
+    color: #01147C;
+    letter-spacing: -0.5px;
+}
+
+.logo-text.white {
+    color: white;
+    font-size: 24px;
+}
