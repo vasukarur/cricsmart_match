@@ -14,11 +14,11 @@ except ImportError as e:
     sys.exit(1)
 
 # Import your app
-from app import app
+from app import handler as app_handler
 
 # Vercel serverless handler
 def handler(request):
-    return app(request)
+    return app_handler(request)
 
 # Export for Vercel
 app = handler
