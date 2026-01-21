@@ -1,4 +1,3 @@
-# Vercel Python Configuration
 {
   "version": 2,
   "builds": [
@@ -19,5 +18,6 @@
     }
   },
   "installCommand": "uv venv && source .venv/bin/activate && uv pip install reportlab==4.0.4 Pillow>=9.0.0",
-  "buildCommand": "python3 -c \"import reportlab; print('Build complete - ReportLab installed')\""
+  "buildCommand": "source .venv/bin/activate && python3 -c 'import reportlab; print(\"Build complete - ReportLab installed\")'",
+  "outputDirectory": "."
 }
