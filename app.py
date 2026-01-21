@@ -6231,7 +6231,58 @@ def main():
 # Vercel serverless handler
 def handler(request):
     """Vercel serverless handler"""
-    return Handler().handle_request(request)
+    # Convert Vercel request to HTTP request format
+    class VercelRequest:
+        def __init__(self, request):
+            self.method = request.get('method', 'GET')
+            self.path = request.get('path', '/')
+            self.headers = request.get('headers', {})
+            self.body = request.get('body', '')
+            
+        def get_header(self, name, default=None):
+            return self.headers.get(name, default)
+    
+    # Create a mock handler for Vercel
+    class MockHandler:
+        def __init__(self):
+            self.headers = {}
+            self.wfile = None
+            
+        def send_response(self, code):
+            self.response_code = code
+            
+        def send_header(self, name, value):
+            self.headers[name] = value
+            
+        def end_headers(self):
+            pass
+            
+        def get_response(self):
+            return getattr(self, 'response_code', 200), self.headers, getattr(self, 'response_body', '')
+    
+    # Handle the request
+    try:
+        # Create handler instance
+        handler_instance = Handler(MockHandler(), VercelRequest(request), '/dev/null')
+        
+        # Process the request based on method
+        if request.get('method', 'GET') == 'GET':
+            handler_instance.do_GET()
+        else:
+            handler_instance.do_POST()
+            
+        # Return response in Vercel format
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'text/html'},
+            'body': 'CricSmart app is running!'
+        }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({'error': str(e)})
+        }
 
 # Export for Vercel
 app = handler
