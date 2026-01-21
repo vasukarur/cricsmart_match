@@ -1,0 +1,2 @@
+# Vercel Python Requirements
+reportlab>=3.6.0

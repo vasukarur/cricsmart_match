@@ -1,20 +1,23 @@
+# Vercel Python Configuration
 {
   "version": 2,
   "builds": [
     {
-      "src": "web_app.py",
+      "src": "app.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "web_app.py"
+      "dest": "app.py"
     }
   ],
   "functions": {
-    "web_app.py": {
+    "app.py": {
       "runtime": "python3.9"
     }
-  }
+  },
+  "installCommand": "pip install reportlab",
+  "buildCommand": "echo 'Build complete'"
 }

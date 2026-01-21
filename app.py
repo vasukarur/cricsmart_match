@@ -1,6 +1,6 @@
+import os
 import json
 import uuid
-import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
@@ -6216,9 +6216,25 @@ def _serve_static_file(handler, path, content_type):
 
 
 def main():
-    server = HTTPServer(('localhost', 8080), Handler)
-    print("CricSmart server running on http://localhost:8080")
-    server.serve_forever()
+    # Local development only
+    port = int(os.environ.get('PORT', 8080))
+    host = os.environ.get('HOST', 'localhost')
+    
+    # Only run server locally
+    if host == 'localhost':
+        server = HTTPServer((host, port), Handler)
+        print(f"CricSmart server running on http://{host}:{port}")
+        server.serve_forever()
+    else:
+        print("Running in serverless mode on Vercel")
+
+# Vercel serverless handler
+def handler(request):
+    """Vercel serverless handler"""
+    return Handler().handle_request(request)
+
+# Export for Vercel
+app = handler
 
 
 if __name__ == "__main__":
