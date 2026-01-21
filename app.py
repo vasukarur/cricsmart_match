@@ -6228,7 +6228,7 @@ def main():
     else:
         print("Running in serverless mode on Vercel")
 
-# Vercel serverless handler
+# Vercel serverless handler - Updated
 def handler(request):
     """Vercel serverless handler"""
     # Convert Vercel request to HTTP request format
