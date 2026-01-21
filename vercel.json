@@ -19,5 +19,5 @@
     }
   },
   "installCommand": "pip install -r requirements.txt",
-  "buildCommand": "python3 -c 'print(\"Build complete\")'"
+  "buildCommand": "python3 -c \"import reportlab; print('Build complete - ReportLab installed')\""
 }
