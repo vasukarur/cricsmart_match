@@ -15,9 +15,9 @@
   ],
   "functions": {
     "app.py": {
-      "runtime": "python3.9"
+      "runtime": "python3.11"
     }
   },
-  "installCommand": "uv venv && source .venv/bin/activate && uv pip install reportlab==3.6.0 Pillow>=9.0.0",
+  "installCommand": "uv venv && source .venv/bin/activate && uv pip install reportlab==4.0.4 Pillow>=9.0.0",
   "buildCommand": "python3 -c \"import reportlab; print('Build complete - ReportLab installed')\""
 }
