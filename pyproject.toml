@@ -1,0 +1,9 @@
+# UV Package Manager Configuration
+[tool.uv]
+dev-dependencies = []
+
+[project]
+dependencies = [
+    "reportlab==3.6.0",
+    "Pillow>=9.0.0"
+]
