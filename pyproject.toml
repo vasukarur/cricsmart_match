@@ -4,6 +4,7 @@ dev-dependencies = []
 
 [project]
 name = "cricsmart"
+version = "1.0.0"
 dependencies = [
     "reportlab==4.0.4",
     "Pillow>=9.0.0"
