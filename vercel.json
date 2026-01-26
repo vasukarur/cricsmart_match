@@ -2,22 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/debug.py",
+      "src": "api/minimal.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "/favicon.ico"
-    },
-    {
       "src": "/(.*)",
-      "dest": "api/debug.py"
+      "dest": "api/minimal.py"
     }
   ]
 }
