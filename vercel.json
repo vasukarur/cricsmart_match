@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/clean.py": {
-      "runtime": "python3.11"
+      "runtime": "@vercel/python"
     }
   },
   "routes": [
