@@ -25,31 +25,37 @@ except ImportError as e:
     print(f"❌ App handler import failed: {e}")
     import traceback
     traceback.print_exc()
-    sys.exit(1)
+    # Don't exit, continue with simple handler
+    app_handler = None
 
-# Simple test handler first
+# Simple test handler
 def test_handler(request):
     """Simple test handler"""
     return {
         'statusCode': 200,
         'headers': {'Content-Type': 'text/html'},
-        'body': '<h1>🏏 CricSmart is Working!</h1><p>Test handler executed successfully!</p>'
+        'body': '<h1>🏏 CricSmart Test Working!</h1><p>Simple handler executed successfully!</p>'
     }
 
 # Vercel serverless handler
 def handler(request):
     """Vercel serverless handler"""
     try:
-        print(f"🎯 Request received: {type(request)}")
+        print(f"🎯 Request received: {type(request)} - {request}")
         
-        # Try simple test first
-        if request.get('path', '/') == '/test':
+        # Always return test for now to debug
+        return test_handler(request)
+        
+        # Try app handler only if it exists
+        if app_handler:
+            print("🔄 Calling app handler...")
+            result = app_handler(request)
+            print(f"✅ Handler executed successfully")
+            return result
+        else:
+            print("⚠️ App handler not available, returning test")
             return test_handler(request)
-        
-        print("🔄 Calling app handler...")
-        result = app_handler(request)
-        print(f"✅ Handler executed successfully")
-        return result
+            
     except Exception as e:
         print(f"❌ Handler execution failed: {e}")
         import traceback
