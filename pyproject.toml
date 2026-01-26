@@ -1,6 +1,6 @@
 # UV Package Manager Configuration
-[tool.uv]
-dev-dependencies = []
+[dependency-groups]
+dev = []
 
 [project]
 name = "cricsmart"
