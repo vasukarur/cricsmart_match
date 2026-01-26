@@ -10,7 +10,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "api/clean.py"
+      "dest": "api/cricket.py"
     }
   ]
 }
