@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.py",
+      "src": "api/test.py",
       "use": "@vercel/python",
       "config": {
         "runtime": "python3.11"
@@ -19,12 +19,8 @@
       "dest": "/favicon.ico"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
       "src": "/(.*)",
-      "dest": "api/index.py"
+      "dest": "api/test.py"
     }
   ]
 }
