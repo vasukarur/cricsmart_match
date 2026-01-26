@@ -1,213 +1,114 @@
-import json
-import uuid
-import os
-from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import urlparse, parse_qs
-from datetime import datetime
-
-from models import MatchState, Team, Player, PlayerRole, BallEvent, WicketType, BattingStats, BowlingStats
-from pdf_generator import generate_scoreboard_pdf
-
-
-# Multi-match state structure
-STATE = {
-    "matches": {},  # Dictionary to store multiple matches by MatchID
-    "current_match_id": None,  # Track current active match
-}
-
-# Session management for MatchID
-SESSIONS = {}  # Store session data if needed
-
-
-def get_match_id_from_request(handler):
-    """Extract MatchID from URL parameters or create new one"""
-    parsed_url = urlparse(handler.path)
-    query_params = parse_qs(parsed_url.query)
-    match_id = query_params.get('match_id', [None])[0]
-    
-    # If no MatchID in URL, check if we have a current match
-    if not match_id and STATE["current_match_id"]:
-        match_id = STATE["current_match_id"]
-    
-    return match_id
-
-
-def create_new_match(match_name=None):
-    """Create a new match with unique MatchID"""
-    match_id = str(uuid.uuid4())
-    match_data = {
-        "match": MatchState(),
-        "started": False,
-        "created_at": datetime.now().isoformat(),
-        "match_name": match_name or f"Match {len(STATE['matches']) + 1}",
-        "updated_at": datetime.now().isoformat(),
-    }
-    STATE["matches"][match_id] = match_data
-    STATE["current_match_id"] = match_id
-    return match_id
-
-
-def get_current_match(match_id=None):
-    """Get current match data by MatchID"""
-    if not match_id:
-        match_id = STATE["current_match_id"]
-    
-    if not match_id or match_id not in STATE["matches"]:
-        # Create new match if none exists
-        match_id = create_new_match()
-    
-    return STATE["matches"][match_id], match_id
-
-
-def update_match_timestamp(match_id):
-    """Update the last updated timestamp for a match"""
-    if match_id in STATE["matches"]:
-        STATE["matches"][match_id]["updated_at"] = datetime.now().isoformat()
-
-
-def get_all_matches():
-    """Get list of all matches with basic info"""
-    matches_list = []
-    for match_id, match_data in STATE["matches"].items():
-        matches_list.append({
-            "match_id": match_id,
-            "match_name": match_data["match_name"],
-            "created_at": match_data["created_at"],
-            "updated_at": match_data["updated_at"],
-            "started": match_data["started"],
-            "team_a_name": match_data["match"].team_a.team_name if match_data["match"].team_a else None,
-            "team_b_name": match_data["match"].team_b.team_name if match_data["match"].team_b else None,
-        })
-    return sorted(matches_list, key=lambda x: x["updated_at"], reverse=True)
-
-
-INDEX_HTML = """<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CricketSmart-Match - Live Cricket Scoring</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background-color: #01147C; color: white; }
-    .muted { color: #b0c4de; font-size: 14px; }
-    .error { color: #ff6b6b; margin-top: 10px; }
-    .score { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-    .row { display: flex; gap: 20px; }
-    .card { background: rgba(255, 255, 255, 0.95); color: #333; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
-    .controls { display: flex; gap: 8px; flex-wrap: wrap; }
-    .controls button { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; background: #007bff; color: white; font-weight: 500; transition: all 0.2s ease; }
-    .controls button:hover { background: #0056b3; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3); }
-    .controls button:active { transform: translateY(0); }
-    
-    /* Mobile Responsive Styles */
-    @media (max-width: 768px) {
-      body { padding: 10px; }
-      .row { flex-direction: column; gap: 15px; }
-      .card { padding: 15px; margin-bottom: 15px; }
-      .controls { gap: 6px; }
-      .controls button { 
-        padding: 12px 20px; 
-        font-size: 16px; 
-        min-height: 44px; 
-        min-width: 80px;
-        flex: 1 1 calc(50% - 3px);
-      }
-      .score { font-size: 20px; }
-      h1 { font-size: 2em; }
-      h2 { font-size: 1.5em; }
-      .tab { 
-        padding: 12px 20px; 
-        font-size: 14px; 
-        min-height: 44px;
-      }
-      input, select { 
-        padding: 12px; 
-        font-size: 16px; 
-        min-height: 44px;
-      }
-      button { 
-        padding: 12px 24px; 
-        font-size: 16px; 
-        min-height: 44px;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      body { padding: 5px; }
-      .controls { gap: 4px; }
-      .controls button { 
-        padding: 10px 16px; 
-        font-size: 14px; 
-        min-width: 70px;
-        flex: 1 1 calc(50% - 2px);
-      }
-      .score { font-size: 18px; }
-      h1 { font-size: 1.8em; }
-      .tab { 
-        padding: 10px 16px; 
-        font-size: 12px;
-        min-height: 44px;
-        flex: 1;
-        min-width: 60px;
-      }
-      /* Summary tabs mobile fix */
-      div[style*="display:flex;border-bottom:2px solid #ddd"] {
-        flex-wrap: wrap !important;
-        gap: 2px !important;
-      }
-      div[style*="display:flex;border-bottom:2px solid #ddd"] button {
-        flex: 1 1 calc(33.33% - 1px);
-        min-width: 80px;
-        font-size: 11px;
-        padding: 8px 4px;
-      }
-    }
-    .tab { padding: 8px 16px; margin-right: 8px; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); border-bottom: none; cursor: pointer; border-radius: 8px 8px 0 0; color: white; transition: all 0.2s ease; }
-    .tab.active { background: rgba(255, 255, 255, 0.95); color: #01147C; border-bottom: 1px solid rgba(255, 255, 255, 0.95); position: relative; top: 1px; }
-    .tabContent { border: 1px solid rgba(255, 255, 255, 0.3); padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.95); color: #333; }
-    input, select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; transition: border-color 0.2s ease; }
-    input:focus, select:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); }
-    button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s ease; }
-    .add-player-btn { background: #01147C; color: white; width: 100%; padding: 10px; font-weight: bold; border: 2px solid rgba(255, 255, 255, 0.2); }
-    .add-player-btn:hover { background: #0152cc; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(1, 20, 124, 0.3); }
-    h1 { color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
-    h2, h3, h4 { color: #01147C; }
-    hr { border: none; height: 1px; background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent); margin: 20px 0; }
-    #teamAList, #teamBList { background: rgba(1, 20, 124, 0.05); padding: 10px; border-radius: 6px; border: 1px solid rgba(1, 20, 124, 0.1); }
-    #teamAList li, #teamBList li { padding: 4px 0; border-bottom: 1px solid rgba(1, 20, 124, 0.1); }
-    #teamAList li:last-child, #teamBList li:last-child { border-bottom: none; }
-    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); z-index: 1999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .popup-alert { background: white; color: #333; padding: 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); max-width: 90%; width: 90%; text-align: center; animation: popupSlide 0.3s ease-out; }
-    .popup-alert h3 { color: #01147C; margin: 0 0 15px 0; font-size: 18px; }
-    .popup-alert p { margin: 0 0 20px 0; line-height: 1.5; font-size: 14px; }
-    .popup-alert button { background: #01147C; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; min-height: 44px; }
-    .popup-alert button:hover { background: #0152cc; }
-    @keyframes popupSlide { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    
-    /* 3D Trophy Animations for Match Summary */
-    .trophy-3d {
-      display: inline-block;
-      font-size: 2.0em;
-      text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
-      background: linear-gradient(135deg, #1e3c72, #2a5298, #1e3c72);
-      border-radius: 50%;
-      padding: 6px 12px;
-      margin-right: 12px;
-      box-shadow: 0 6px 12px rgba(30, 60, 114, 0.3), inset 0 3px 6px rgba(255, 255, 255, 0.1);
-      position: relative;
-    }
-    
-    .trophy-stars {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 60px;
-      height: 60px;
-      transform: translate(-50%, -50%);
-      animation: starsOrbitHorizontal 4s linear infinite;
-    }
-    
-    .trophy-star {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CricSmart - Cricket Scoring Application</title>
+    <link rel="stylesheet" href="cricsmart-logo.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #01147C 0%, #2a4d8f 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .header {
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header h2 {
+            font-size: 1.5em;
+            color: #a8c7ff;
+            margin-bottom: 30px;
+        }
+        .status-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .status-card h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        .button {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.2);
+        }
+        .result {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+            border: 1px solid rgba(255,255,255,0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .result pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #a8c7ff;
+            font-size: 14px;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .feature-card h4 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+    </style>
       position: absolute;
       font-size: 0.5em;
       animation: starPulse 1.5s ease-in-out infinite alternate;
