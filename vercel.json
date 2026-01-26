@@ -1,14 +1,9 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/clean.py",
-      "use": "@vercel/python",
-      "config": {
-        "runtime": "python3.11"
-      }
+  "functions": {
+    "api/clean.py": {
+      "runtime": "python3.11"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/static/(.*)",
