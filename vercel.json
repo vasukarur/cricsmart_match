@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/minimal.py",
+      "src": "api/index.py",
       "use": "@vercel/python"
     }
   ],
@@ -12,12 +12,8 @@
       "dest": "/favicon.ico"
     },
     {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "api/minimal.py"
+      "dest": "api/index.py"
     }
   ]
 }
